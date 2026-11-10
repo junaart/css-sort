@@ -1,0 +1,8 @@
+[package]
+name = "ipnsort"
+version = "0.1.0"
+edition = "2021"
+authors = ["Lukas Bergdoll <lukas.bergdoll@gmail.com>"]
+[lib]
+doctest = false
+test = false

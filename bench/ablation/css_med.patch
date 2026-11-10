@@ -1,0 +1,47 @@
+--- css.c
++++ css_med.c
+@@ -1,3 +1,6 @@
++#ifndef CSS_MED
++#define CSS_MED 0
++#endif
+ /*==== css.c — CSS: сортировка сравнениями построением порождающей последовательности на лету ====
+ 
+   SPDX-License-Identifier: MIT
+@@ -458,7 +461,11 @@
+     /* порог: первый элемент порождающей последовательности узла */
+     uint64_t t; int eq_run = 0;
+     if (vmode && T && tb - ta >= 2) { t = T[(ta + tb) >> 1]; if (t <= lo) t = lo + 1; }   /* медиана массы по таблице */
+-    else if (vmode || bisect) t = cpa_bisect(lo, hi);          /* c = 2 */
++#if CSS_MED
++    else if (bisect) t = cpa_bisect(lo, hi);                   /* опыт: в режиме значений — медиана выборки */
++#else
++    else if (vmode || bisect) t = cpa_bisect(lo, hi);          /* c = 2 */
++#endif
+     else {
+       uint64_t p;                                              /* c по медиане выборки */
+       if (n >= 4096) p = cpa_sample_median(Q, x, n, n >= 65536 ? 127 : 31);
+@@ -554,10 +561,10 @@
+   uint64_t buf[128]; int s;
+   int few = cpa_few_distinct_buf(Q + x, n, buf, &s);
+   CSS_ST(css_st_lg0 = CSS_BUDGET(lg));
+-  if (!few && cpa_tab_useful(buf, s, lo, hi)) {
++  if (CSS_MED != 2 && !few && cpa_tab_useful(buf, s, lo, hi)) {
+     int64_t ta = cpa_tab_lb(buf, 0, s, lo), tb = hi == UINT64_MAX ? s : cpa_tab_lb(buf, 0, s, hi + 1);
+     cs_pdq_rec_t(Q, x, x + n - 1, lo, hi, CSS_BUDGET(lg), 1, buf, ta, tb);
+-  } else cs_pdq_rec(Q, x, x + n - 1, lo, hi, CSS_BUDGET(lg), !few);
++  } else cs_pdq_rec(Q, x, x + n - 1, lo, hi, CSS_BUDGET(lg), CSS_MED == 2 ? 0 : !few);
+ }
+ 
+ /* ============================================================================
+@@ -1364,7 +1371,11 @@
+   int64_t z = cpd_partition_mm(Q, s, e - 1, t, &mn, &mx);
+   if (mn == mx) return;
+   int lg = 0; while (((int64_t)1 << (lg + 1)) <= n && lg < 62) lg++;
++#if CSS_MED == 2
++  int vmode = 0; (void)few;                             /* опыт: только медиана, без режима значений */
++#else
+   int vmode = !few;
++#endif
+   /* таблица густоты: прошлого массива, если она согласна с выборкой сегмента и не почти
+      равномерна на [mn, mx]; иначе выборка корня, если она не почти равномерна; иначе деление пополам */
+   const uint64_t *TT = NULL; int64_t TS = 0;

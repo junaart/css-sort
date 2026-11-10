@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "CSS: a hybrid sort of natural numbers based on a generating sequence built on the fly"
+authors:
+  - family-names: Artamonov Stepanov
+    given-names: "Yu. N." "A. D."
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "A hybrid algorithm for sorting natural numbers based on a generating sequence built on the fly"
+  authors:
+    - family-names: Artamonov Stepanov
+      given-names: "Yu. N." "A. D."
+  collection-title: "IEEE REEPE 2027"
+  year: 2027
